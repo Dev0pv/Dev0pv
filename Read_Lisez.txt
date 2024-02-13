@@ -1,0 +1,9 @@
+English:
+To use this software
+select a jpg image You want to set it as your fortnite background.
+Once selected click on rename file.
+And after you clicked rename file click on Apply.
+Français:
+ok donc pour utiliser ce logiciel
+click sur "Browse Jpg" et choisi un image en .jpg Exemple: GorillaTag.jpg
+Aprés click sur "rename file" et sur apply.

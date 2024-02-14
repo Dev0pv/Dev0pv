@@ -4,71 +4,52 @@ import tkinter as tk
 from tkinter import ttk, filedialog
 from PIL import Image, ImageTk
 from ttkthemes import ThemedTk
-import sv_ttk
 
 class ImageRenamerApp:
     def __init__(self, master):
         self.master = master
         self.master.title("DesiNite")
+        self.master.set_theme('arc')
 
-        
-        self.master.set_theme('clearlooks')
-
-        
-        background_path = "C:/Users/micha/Downloads/OIP.jpg"
-        if os.path.exists(background_path):
-            img = Image.open(background_path)
-            img = img.resize((1920, 1080), Image.BICUBIC)
-            img = ImageTk.PhotoImage(img)
-            panel = tk.Label(master, image=img)
-            panel.image = img
-            panel.place(x=0, y=0, relwidth=1, relheight=1)
-
-       
         self.tabs = ttk.Notebook(master)
         self.load_image_tab = ttk.Frame(self.tabs)
         self.wallpaper_tab = ttk.Frame(self.tabs)
 
-        
         self.tabs.add(self.load_image_tab, text="Load Image")
         self.tabs.add(self.wallpaper_tab, text="Wallpaper")
 
-        
         self.tabs.pack(fill=tk.BOTH, expand=True)
 
-       
         self.load_image_label = tk.Label(self.load_image_tab, text="Browse and Rename Image:")
         self.load_image_label.pack(pady=10)
 
-        self.browse_button = tk.Button(self.load_image_tab, text="Browse BMP", command=self.browse_image)
+        self.browse_button = ttk.Button(self.load_image_tab, text="Browse BMP", command=self.browse_image)
         self.browse_button.pack(pady=10)
 
-        self.rename_button = tk.Button(self.load_image_tab, text="Rename Image", command=self.rename_image)
+        self.rename_button = ttk.Button(self.load_image_tab, text="Rename Image", command=self.rename_image)
         self.rename_button.pack(pady=10)
 
-        self.change_load_screen_button = tk.Button(self.load_image_tab, text="Change Load Screen", command=self.change_load_screen)
+        self.change_load_screen_button = ttk.Button(self.load_image_tab, text="Change Load Screen", command=self.change_load_screen)
         self.change_load_screen_button.pack(pady=10)
 
-        self.reset_load_image_button = tk.Button(self.load_image_tab, text="Reset", command=self.reset_load_image)
+        self.reset_load_image_button = ttk.Button(self.load_image_tab, text="Reset", command=self.reset_load_image)
         self.reset_load_image_button.pack(pady=10)
 
-        
         self.wallpaper_label = tk.Label(self.wallpaper_tab, text="Browse and Rename Wallpaper:")
         self.wallpaper_label.pack(pady=10)
 
-        self.browse_wallpaper_button = tk.Button(self.wallpaper_tab, text="Browse JPG", command=self.browse_wallpaper)
+        self.browse_wallpaper_button = ttk.Button(self.wallpaper_tab, text="Browse JPG", command=self.browse_wallpaper)
         self.browse_wallpaper_button.pack(pady=10)
 
-        self.rename_wallpaper_button = tk.Button(self.wallpaper_tab, text="Rename Wallpaper", command=self.rename_wallpaper)
+        self.rename_wallpaper_button = ttk.Button(self.wallpaper_tab, text="Rename Wallpaper", command=self.rename_wallpaper)
         self.rename_wallpaper_button.pack(pady=10)
 
-        self.apply_wallpaper_button = tk.Button(self.wallpaper_tab, text="Apply Wallpaper", command=self.apply_wallpaper)
+        self.apply_wallpaper_button = ttk.Button(self.wallpaper_tab, text="Apply Wallpaper", command=self.apply_wallpaper)
         self.apply_wallpaper_button.pack(pady=10)
 
-        self.reset_wallpaper_button = tk.Button(self.wallpaper_tab, text="Reset", command=self.reset_wallpaper)
+        self.reset_wallpaper_button = ttk.Button(self.wallpaper_tab, text="Reset", command=self.reset_wallpaper)
         self.reset_wallpaper_button.pack(pady=10)
 
-       
         self.result_label = tk.Label(self.master, text="", fg="green", font=("Arial", 12))
         self.result_label.pack(pady=10)
 
@@ -82,10 +63,16 @@ class ImageRenamerApp:
         if hasattr(self, 'selected_image'):
             new_name = os.path.join(os.path.dirname(self.selected_image), "Splash.bmp")
             try:
+                if os.path.exists(new_name):
+                    raise FileExistsError(f"Target file {new_name} already exists.")
+
                 os.rename(self.selected_image, new_name)
-                self.selected_image = new_name  
+                self.selected_image = new_name
                 print(f"Image renamed to {new_name}")
                 self.set_result_message("Image renamed successfully", "green")
+            except FileExistsError as e:
+                print(f"Error renaming image: {e}")
+                self.set_result_message("Error renaming image: File already exists", "red")
             except Exception as e:
                 print(f"Error renaming image: {e}")
                 self.set_result_message("Error renaming image", "red")
@@ -97,16 +84,17 @@ class ImageRenamerApp:
         if hasattr(self, 'selected_image'):
             splash_folder_path = "C:/Program Files/Epic Games/Fortnite/FortniteGame/Content/Splash"
             try:
-                
                 for file_name in os.listdir(splash_folder_path):
                     file_path = os.path.join(splash_folder_path, file_name)
                     if os.path.isfile(file_path):
                         os.remove(file_path)
 
-                
                 shutil.copy(self.selected_image, splash_folder_path)
                 print(f"Load screen changed successfully.")
                 self.set_result_message("Load screen changed successfully", "green")
+            except FileExistsError as e:
+                print(f"Error changing load screen: {e}")
+                self.set_result_message("Error changing load screen: File already exists", "red")
             except Exception as e:
                 print(f"Error changing load screen: {e}")
                 self.set_result_message("Error changing load screen", "red")
@@ -118,10 +106,16 @@ class ImageRenamerApp:
         if hasattr(self, 'selected_image'):
             original_name = os.path.join(os.path.dirname(self.selected_image), "Splash_original.bmp")
             try:
+                if os.path.exists(original_name):
+                    raise FileExistsError(f"Target file {original_name} already exists.")
+
                 os.rename(self.selected_image, original_name)
-                self.selected_image = original_name  
+                self.selected_image = original_name
                 print(f"Image reset to {original_name}")
                 self.set_result_message("Image reset successfully", "green")
+            except FileExistsError as e:
+                print(f"Error resetting image: {e}")
+                self.set_result_message("Error resetting image: File already exists", "red")
             except Exception as e:
                 print(f"Error resetting image: {e}")
                 self.set_result_message("Error resetting image", "red")
@@ -139,10 +133,16 @@ class ImageRenamerApp:
         if hasattr(self, 'selected_wallpaper'):
             new_name = os.path.join(os.path.dirname(self.selected_wallpaper), "94B6B9B00327C76C152A04591443D1E70429F4B0.jpg")
             try:
+                if os.path.exists(new_name):
+                    raise FileExistsError(f"Target file {new_name} already exists.")
+
                 os.rename(self.selected_wallpaper, new_name)
-                self.selected_wallpaper = new_name  
+                self.selected_wallpaper = new_name
                 print(f"Wallpaper renamed to {new_name}")
                 self.set_result_message("Wallpaper renamed successfully", "green")
+            except FileExistsError as e:
+                print(f"Error renaming wallpaper: {e}")
+                self.set_result_message("Error renaming wallpaper: File already exists", "red")
             except Exception as e:
                 print(f"Error renaming wallpaper: {e}")
                 self.set_result_message("Error renaming wallpaper", "red")
@@ -161,6 +161,9 @@ class ImageRenamerApp:
                 shutil.copy(self.selected_wallpaper, wallpaper_folder_path)
                 print(f"Wallpaper changed successfully.")
                 self.set_result_message("Wallpaper changed successfully", "green")
+            except FileExistsError as e:
+                print(f"Error changing wallpaper: {e}")
+                self.set_result_message("Error changing wallpaper: File already exists", "red")
             except Exception as e:
                 print(f"Error changing wallpaper: {e}")
                 self.set_result_message("Error changing wallpaper", "red")
@@ -172,10 +175,16 @@ class ImageRenamerApp:
         if hasattr(self, 'selected_wallpaper'):
             original_name = os.path.join(os.path.dirname(self.selected_wallpaper), "94B6B9B00327C76C152A04591443D1E70429F4B0_original.jpg")
             try:
+                if os.path.exists(original_name):
+                    raise FileExistsError(f"Target file {original_name} already exists.")
+
                 os.rename(self.selected_wallpaper, original_name)
-                self.selected_wallpaper = original_name  
+                self.selected_wallpaper = original_name
                 print(f"Wallpaper reset to {original_name}")
                 self.set_result_message("Wallpaper reset successfully", "green")
+            except FileExistsError as e:
+                print(f"Error resetting wallpaper: {e}")
+                self.set_result_message("Error resetting wallpaper: File already exists", "red")
             except Exception as e:
                 print(f"Error resetting wallpaper: {e}")
                 self.set_result_message("Error resetting wallpaper", "red")
@@ -186,10 +195,7 @@ class ImageRenamerApp:
     def set_result_message(self, message, color):
         self.result_label.config(text=message, fg=color)
 
-
 if __name__ == "__main__":
-    root = ThemedTk(theme="clearlooks")
+    root = ThemedTk(theme="arc")
     app = ImageRenamerApp(root)
     root.mainloop()
-
-
